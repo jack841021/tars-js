@@ -16,7 +16,7 @@ cron.schedule('* * * * *', () => {
 function parse(text) {
     let time = text.slice(0, 11)
     if (time.match(/\d\d\/\d\d \d\d:\d\d/)) {
-        time = moment(text.slice(0, 11), 'MM/DD HH:mm').unix()
+        time = moment(text.slice(0, 11) + ' +0800', 'MM/DD HH:mm ZZ').unix()
         text = text.slice(12)
         return { time, text }
     }
@@ -38,14 +38,17 @@ function check() {
 
 function handler(req, res) {
     let event = req.body.events[0]
-    let schedule = parse(event.message.text)
-    schedule.user_id = event.source.userId
-    add(schedule)
-    let message = {
-        replyToken: event.replyToken,
-        text: 'Roger'
+    console.log(event.message.text)
+    let order = parse(event.message.text)
+    if (order) {
+        order.user_id = event.source.userId
+        add(order)
+        let message = {
+            text: 'Roger that',
+            replyToken: event.replyToken
+        }
+        reply(message)
     }
-    reply(message)
     res.sendStatus(200)
 }
 
