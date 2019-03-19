@@ -8,7 +8,7 @@ const push_url = 'https://api.line.me/v2/bot/message/push'
 
 function push(doc) {
     let body = {
-        to: doc._source.user_id,
+        to: doc._source.user,
         messages: [{
             type: 'text',
             text: doc._source.text

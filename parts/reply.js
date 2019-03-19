@@ -5,13 +5,10 @@ dotenv.config()
 const token = process.env.token
 const reply_url = 'https://api.line.me/v2/bot/message/reply'
 
-function reply(message) {
+function reply(user, text, hook) {
     let body = {
-        messages: [{
-            type: 'text',
-            text: message.text
-        }],
-        replyToken: message.replyToken
+        messages: [{ type: 'text', text }],
+        replyToken: hook
     }
     let headers = { 'Authorization': 'Bearer ' + token }
     axios.post(reply_url, body, { headers })

@@ -1,6 +1,6 @@
 const express = require('express')
 
-const schedule = require('./parts/schedule')
+const parse = require('./parts/parse')
 
 const app = express()
 
@@ -18,8 +18,8 @@ app.get('/', (req, res) => {
     res.send('Stand by.')
 })
 
-app.post('/', schedule.handler)
+app.post('/', parse)
 
 app.listen(3000, () => {
-    console.log('TARS listening on port 3000!')
+    console.log('TARS is listening on port 3000!')
 })
