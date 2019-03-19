@@ -10,7 +10,7 @@ async function parse(req, res) {
     let hook = event.replyToken
     let words = text.split(' ')
     if (words[0] == 'add') {
-        let time = moment('{} {} +8'.format(words[1], words[2]), 'M/D H:m Z').unix()
+        let time = moment('{} {} +0800'.format(words[1], words[2]), 'M/D H:m Z').unix()
         let task = words.slice(3).join(' ')
         await schedule.add(user, time, task, hook)
     }

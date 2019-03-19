@@ -14,11 +14,11 @@ function sleep(ms) {
 }
 
 async function get(user, hook) {
-    await sleep(2000)
+    await sleep(1000)
     let result = await axios.get(es_host + 'schedule/object/_search?&q=user:{}&sort=time:asc'.format(user))
     let docs = result.data.hits.hits
     let schedules = docs.map(doc => {
-        return moment(doc._source.time).utcOffset(+8).format('MM/DD HH:mm') + ' ' + doc._source.task
+        return moment(doc._source.time * 1000).utcOffset(8).format('MM/DD HH:mm') + ' ' + doc._source.task
     })
     if (!schedules.length) {
         schedules = ['empty']
