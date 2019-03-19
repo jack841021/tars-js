@@ -7,33 +7,29 @@ const reply = require('./reply')
 dotenv.config()
 const es_host = process.env.es_host
 
-function get(user, hook) {
-    axios.get(es_host + 'schedule/object/_search?&q=user:{}&sort=time:asc'.format(user)).then(
-        result => {
-            let schedules = result.data.hits.hits.map(doc => {
-                return moment(doc._source.time).utcOffset(+8).format('MM/DD HH:mm') + ' ' + doc._source.task
-            })
-            reply(user, schedules.join('\n'), hook)
-        }
-    )
+async function get(user, hook) {
+    let result = await axios.get(es_host + 'schedule/object/_search?&q=user:{}&sort=time:asc'.format(user))
+    let docs = result.data.hits.hits
+    let schedules = docs.map(doc => {
+        return moment(doc._source.time).utcOffset(+8).format('MM/DD HH:mm') + ' ' + doc._source.task
+    })
+    await reply(user, schedules.join('\n'), hook)
 }
 
-function add(user, time, task, hook) {
-    axios.post(es_host + 'schedule/object', { user, time, task }).then(
-        get(user, hook)
-    )
+async function add(user, time, task, hook) {
+    await axios.post(es_host + 'schedule/object', { user, time, task })
+    await get(user, hook)
 }
 
-function del(user, task, hook) {
-    axios.get(es_host + 'schedule/object/_search?q=user:{}&size=10000'.format(user)).then(
-        result => {
-            result.data.hits.hits.forEach(doc => {
-                if (doc._source.task == task) {
-                    axios.delete(es_host + 'schedule/object/' + doc._id)
-                }
-            })
-        }
-    ).then(get(user, hook))
+async function del(user, task, hook) {
+    let result = await axios.get(es_host + 'schedule/object/_search?q=user:{}&size=10000'.format(user))
+    let docs = result.data.hits.hits
+    await Promise.all(docs.map(doc => {
+        if (doc._source.task == task) {
+            return axios.delete(es_host + 'schedule/object/' + doc._id)
+        }})
+    )
+    await get(user, hook)
 }
 
 module.exports = { get, add, del }
