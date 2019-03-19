@@ -7,12 +7,22 @@ const reply = require('./reply')
 dotenv.config()
 const es_host = process.env.es_host
 
+function sleep(ms) {
+    return new Promise(res => {
+        setTimeout(res, ms)
+    })
+}
+
 async function get(user, hook) {
+    await sleep(2000)
     let result = await axios.get(es_host + 'schedule/object/_search?&q=user:{}&sort=time:asc'.format(user))
     let docs = result.data.hits.hits
     let schedules = docs.map(doc => {
         return moment(doc._source.time).utcOffset(+8).format('MM/DD HH:mm') + ' ' + doc._source.task
     })
+    if (!schedules.length) {
+        schedules = ['empty']
+    }
     await reply(user, schedules.join('\n'), hook)
 }
 

@@ -14,10 +14,6 @@ String.prototype.format = function () {
 
 app.use(express.json())
 
-app.get('/', (req, res) => {
-    res.send('Stand by.')
-})
-
 app.post('/', parse)
 
 app.listen(3000, () => {
