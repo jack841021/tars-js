@@ -1,6 +1,7 @@
 const express = require('express')
 
 const parse = require('./parts/parse')
+const meetup = require('./parts/meetup')
 
 const app = express()
 

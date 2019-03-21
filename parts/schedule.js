@@ -17,9 +17,9 @@ async function get(user, hook) {
     await sleep(1000)
     let result = await axios.get(es_host + 'schedule/object/_search?&q=user:{}&sort=time:asc'.format(user))
     let docs = result.data.hits.hits
-    let schedules = docs.map(doc => {
-        return moment(doc._source.time * 1000).utcOffset(8).format('MM/DD HH:mm') + ' ' + doc._source.task
-    })
+    let schedules = docs.map(doc =>
+        moment(doc._source.time * 1000).utcOffset(8).format('MM/DD HH:mm') + ' ' + doc._source.task
+    )
     if (!schedules.length) {
         schedules = ['empty']
     }
@@ -35,7 +35,7 @@ async function del(user, task, hook) {
     let result = await axios.get(es_host + 'schedule/object/_search?q=user:{}&size=10000'.format(user))
     let docs = result.data.hits.hits
     await Promise.all(docs.map(doc => {
-        if (doc._source.task == task) {
+        if (doc._source.task.includes(task)) {
             return axios.delete(es_host + 'schedule/object/' + doc._id)
         }})
     )
