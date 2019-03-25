@@ -1,9 +1,9 @@
 const moment = require('moment')
 
-const check = require('./meetup')
-const reply = require('./reply')
-const keyword = require('./keyword')
-const schedule = require('./schedule')
+const line = require('./line')
+const task = require('./task')
+const meetup = require('./meetup')
+const subscribe = require('./subscribe')
 
 async function parse(req, res) {
     let event = req.body.events[0]
@@ -11,38 +11,36 @@ async function parse(req, res) {
     let text = event.message.text
     let hook = event.replyToken
     let words = text.split(' ')
-    if (words[0] == 'sch') {
+    if (words[0] == 'task') {
         if (words[1] == 'add') {
             let time = moment('{} {} +0800'.format(words[2], words[3]), 'M/D H:m Z').unix()
-            let task = words.slice(4).join(' ')
-            await schedule.add(user, time, task, hook)
+            await task.add(user, time, words.slice(4).join(' '), hook)
         }
         else if (words[1] == 'get') {
-            await schedule.get(user, hook)
+            await task.get(user, hook)
         }
         else if (words[1] == 'del') {
-            let task = words.slice(2).join(' ')
-            await schedule.del(user, task, hook)
+            await task.del(user,words.slice(2).join(' '), hook)
         }
     }
-    else if (words[0] == 'key') {
+    else if (words[0] == 'meet') {
         if (words[1] == 'add') {
             let keyword = words.slice(2).join(' ')
-            await keyword.add(user, keyword, hook)
+            await subscribe.add(user, keyword, hook)
         }
         else if (words[1] == 'get') {
-            await keyword.get(user, hook)
+            await subscribe.get(user, hook)
         }
         else if (words[1] == 'del') {
             let keyword = words.slice(2).join(' ')
-            await keyword.del(user, keyword, hook)
+            await subscribe.del(user, keyword, hook)
         }
         else if (words[1] == 'chk') {
-            await check()
+            await meetup.check()
         }
     }
     else {
-        await reply(user, '?', hook)
+        await line.reply('?', hook)
     }
     res.sendStatus(200)
 }
